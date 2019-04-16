@@ -1,0 +1,100 @@
+body {
+  width: 800px;
+  margin: 0 auto;
+  font-family: 'Open Sans', sans-serif;
+}
+.container {
+  width: 600px;
+  margin: 0 auto;
+}
+fieldset {
+  display: block;
+  -webkit-margin-start: 0px;
+  -webkit-margin-end: 0px;
+  -webkit-padding-before: 0em;
+  -webkit-padding-start: 0em;
+  -webkit-padding-end: 0em;
+  -webkit-padding-after: 0em;
+  border: 0px;
+  border-image-source: initial;
+  border-image-slice: initial;
+  border-image-width: initial;
+  border-image-outset: initial;
+  border-image-repeat: initial;
+  min-width: -webkit-min-content;
+  padding: 30px;
+}
+.grammar-input-line {
+  display: inline-block;
+  padding-top: 30px;
+  width: 100%;
+}
+.grammar-input {
+  display: inline-block;
+  font-weight:300;
+  font-size: 25px;
+  border:0px;
+  outline: none;
+  width: 94%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  color: #4b545f;
+  background: #fff;
+  font-family: Open Sans, Verdana;
+  padding: 10px 15px;
+  margin: 30px 0px;
+  -webkit-transition: all 0.1s ease-in-out;
+  -moz-transition: all 0.1s ease-in-out;
+  -ms-transition: all 0.1s ease-in-out;
+  -o-transition: all 0.1s ease-in-out;
+  transition: all 0.1s ease-in-out;
+}
+.grammar-input:focus {
+  border-bottom:1px solid #ddd;
+}
+img {
+  display: inline;
+  max-width: 15px;
+  vertical-align: middle;
+  right: 50px;
+  position: relative;
+  transform: translate(0, -20%);
+  opacity: 0.8;
+  cursor: pointer;
+}
+img:hover {
+    opacity: 1;
+}
+.grammar-button {
+  background: #15c39a;
+  color: #fff;
+  cursor: pointer;
+  border-radius: 100px;
+  border: 0;
+  padding:10px 30px;
+  width: 100%;
+  min-width: 350px;
+  -webkit-transition: all 0.1s ease-in-out;
+  -moz-transition: all 0.1s ease-in-out;
+  -ms-transition: all 0.1s ease-in-out;
+  -o-transition: all 0.1s ease-in-out;
+  transition: all 0.1s ease-in-out;
+}
+.grammar-button:hover {
+  opacity: 0.8;
+}
+.grammar-results {
+    padding: 0 30px;
+    font-size: 15px;
+}
+h5 {
+    position: relative;
+    font-size: 15px;
+    right: 10px;
+    font-weight: 600;
+}
+table {
+    width: 100%;
+    text-align: center;
+}
