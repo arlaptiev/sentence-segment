@@ -2,7 +2,7 @@ import numpy as np
 import pickle
 import nltk
 from nltk.tokenize import word_tokenize
-from nltk.tokenize.moses import MosesDetokenizer
+from mosestokenizer import MosesDetokenizer
 from nltk.corpus import brown
 import sklearn_crfsuite
 from sklearn_crfsuite import metrics

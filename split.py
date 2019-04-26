@@ -1,7 +1,7 @@
 import sys
 import json
 import collections
-import segmenter as seg
+import model.segmenter as seg
 
 
 def read_in():
