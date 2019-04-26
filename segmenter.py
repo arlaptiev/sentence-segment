@@ -1,21 +1,22 @@
 import numpy as np
+import pickle
 import nltk
 from nltk.tokenize import word_tokenize
 from nltk.tokenize.moses import MosesDetokenizer
 from nltk.corpus import brown
-import pycrfsuite
+import sklearn_crfsuite
+from sklearn_crfsuite import metrics
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report
 
 
 class Segmenter:
 
     def __init__(self):
-        '''Trains a CRF model'''
+        '''Loads data for training and testing a CRF model'''
         data = self.get_sents()
 
-        X = [self.extract_features(sent) for sent in data]
-        y = [self.get_labels(doc) for doc in data]
+        X = [self.sent2features(sent) for sent in data]
+        y = [self.sent2labels(sent) for sent in data]
 
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(X, y, test_size=0.2)
 
@@ -43,6 +44,15 @@ class Segmenter:
 
         # Join every two sentence
         paragraphs = [a + b for a, b in zip(labeled_sents[::2], labeled_sents[1::2])]
+
+        '''TODO for comma splice
+        # Join every two sentence
+        p1 = [a[:-1] + [[a[-1][0]] + ['S']] + [[',', 'P']] + b for a,
+              b in zip(labeled_sents[::4], labeled_sents[1::4])]
+        # Join every other two sentence with a comma after the first one - comma splice
+        p2 = [a + b for a, b in zip(labeled_sents[2::4], labeled_sents[3::4])]
+
+        paragraphs = p1 + p2'''
 
         data = []
         for p in paragraphs:
@@ -108,72 +118,77 @@ class Segmenter:
         return features
 
     @staticmethod
-    def extract_features(sent):
-        '''A function for extracting featur es from sentences'''
+    def sent2features(sent):
+        '''A function for extracting features from sentences'''
         return [Segmenter.word2features(sent, i) for i in range(len(sent))]
 
-    def get_labels(self, sent):
+    def sent2labels(self, sent):
         '''A function for generating the output list of labels for each sentence'''
         return [label for (token, postag, label) in sent]
 
     def train(self):
-        trainer = pycrfsuite.Trainer(verbose=True)
+        crf = sklearn_crfsuite.CRF(
+            algorithm='lbfgs',
 
-        # Submit training data to the trainer
-        for xseq, yseq in zip(self.X_train, self.y_train):
-            trainer.append(xseq, yseq)
-
-        # Set the parameters of the model
-        trainer.set_params({
             # coefficient for L1 penalty
-            'c1': 0.1,
+            c1=0.8377072127476861,
 
             # coefficient for L2 penalty
-            'c2': 0.01,
+            c2=4.083015357819278e-05,
 
             # maximum number of iterations
-            'max_iterations': 200,
+            max_iterations=200,
 
             # whether to include transitions that
             # are possible, but not observed
-            'feature.possible_transitions': True
-        })
+            all_possible_transitions=True
+        )
+        # Submit training data to the trainer
+        crf.fit(self.X_train, self.y_train)
 
-        # Provide a file name as a parameter to the train function, such that
-        # the model will be saved to the file when training is finished
-        trainer.train('crf.model')
+        # Save the model into 'crf.model' file
+        self.save_model(crf)
 
     def test(self):
-        # Generate predictions
-        tagger = pycrfsuite.Tagger()
-        tagger.open('crf.model')
-        y_pred = [tagger.tag(xseq) for xseq in self.X_test]
+        # Load model
+        crf = self.load_model()
 
-        # Let's take a look at a random sample in the testing set
+        # Generate predictions
+        y_pred = crf.predict(self.X_test)
+
+        # Random sample in the testing set
         i = 6
         for x, y in zip(y_pred[i], [x[1].split("=")[1] for x in self.X_test[i]]):
             print("%s (%s)" % (y, x))
 
         # Create a mapping of labels to indices
-        labels = {"S": 0, "P": 1}
-
-        # Convert the sequences of tags into a 1-dimensional array
-        predictions = np.array([labels[tag] for row in y_pred for tag in row])
-        truths = np.array([labels[tag] for row in self.y_test for tag in row])
+        labels = list(crf.classes_)
 
         # Print out the classification report
-        print(classification_report(
-            truths, predictions,
-            target_names=["S", "P"]))
+        print(metrics.flat_classification_report(
+            self.y_test, y_pred, labels=labels, digits=3
+        ))
+
+    def save_model(self, crf):
+        with open('crf.model', 'wb') as f:
+            pickle.dump(crf, f)
+
+    @staticmethod
+    def load_model():
+        with open('crf.model', 'rb') as f:
+            return pickle.load(f)
+
+    @staticmethod
+    def predict(tokens):
+        '''Returns predicted labels of the string'''
+        X = Segmenter.sent2features(nltk.pos_tag(tokens))
+        return Segmenter.load_model().predict([X])[0]
 
     @staticmethod
     def segment_sent(s):
         '''Segments a sentence pased on prediction'''
         tokens = word_tokenize(s)
-        X = Segmenter.extract_features(nltk.pos_tag(tokens))
-        tagger = pycrfsuite.Tagger()
-        tagger.open('crf.model')
-        y = tagger.tag(X)
+        y = Segmenter.predict(tokens)
 
         detokenizer = MosesDetokenizer()
 

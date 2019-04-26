@@ -24,6 +24,8 @@
 
         <% if(segments !== null){ %>
           <div class="grammar-results">
+              <h5>Original:</h5>
+              <p><%= sent %></p>
               <h5>Segments:</h5>
               <% for (i = 0; i < segments.length; i++) { %>
               <p><%= segments[i] %></p>
@@ -36,9 +38,9 @@
                   <th><b>F1 score:</b></th>
                 </tr>
                 <tr>
-                  <td>0.81</td>
-                  <td>0.53</td>
-                  <td>0.5</td>
+                  <td>0.77</td>
+                  <td>0.46</td>
+                  <td>0.56</td>
                 </tr>
               </table>
               <center><h5>This work is still in progress. Thanks for checking it out!</h5></center>

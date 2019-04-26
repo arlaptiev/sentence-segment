@@ -20,7 +20,7 @@ app.set('view engine', 'ejs')
 
 // Render templates for get and post requests
 app.get('/', function (req, res) {
-  res.render('index', {segments: null});
+  res.render('index', {sent: null, segments: null});
 })
 
 app.post('/', function (req, res) {
@@ -39,7 +39,7 @@ app.post('/', function (req, res) {
       // Split the dataString's lines and slice off the last empty element
       arr = dataString.split(/\r?\n/).slice(0, -1);
 
-      res.render('index', {segments: arr});
+      res.render('index', {sent: sentence, segments: arr});
   });
   py.stdin.write(JSON.stringify(sentence));
   py.stdin.end();
