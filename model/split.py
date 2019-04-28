@@ -1,7 +1,7 @@
 import sys
 import json
 import collections
-import model.segmenter as seg
+import segmenter as seg
 
 
 def read_in():
@@ -20,21 +20,23 @@ def flatten(lst):
             yield el
 
 
-def get_segments(sent):
+def get_segments(sent, segmenter):
     '''Recusrively predicts multiple (more than just two) segments of a sentence'''
-    segments = seg.Segmenter.segment_sent(sent)
+    segments = segmenter.segment_sent(sent)
 
     if segments[0] == sent:
         return [sent]
 
-    return [get_segments(segments[0]), get_segments(segments[1])]
+    return [get_segments(segments[0], segmenter), get_segments(segments[1], segmenter)]
 
 
 def main():
     '''Get data as a string from read_in() and write out the segments'''
     line = read_in()
 
-    segments = get_segments(line)
+    s = seg.Segmenter()
+
+    segments = get_segments(line, s)
 
     for s in flatten(segments):
         print("%s%s" % (s[0].upper(), s[1:]) + '.')
